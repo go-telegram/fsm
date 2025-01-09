@@ -70,7 +70,8 @@ func (app *Application) handlerCancel(ctx context.Context, b *bot.Bot, update *m
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
 
-	if app.f.Current(userID) == stateDefault {
+	currentState, _ := app.f.Current(userID)
+	if currentState == stateDefault {
 		return
 	}
 
@@ -86,7 +87,8 @@ func (app *Application) handlerForm(ctx context.Context, b *bot.Bot, update *mod
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
 
-	if app.f.Current(userID) != stateDefault {
+	currentState, _ := app.f.Current(userID)
+	if currentState != stateDefault {
 		return
 	}
 
@@ -101,7 +103,9 @@ func (app *Application) handlerDefault(ctx context.Context, b *bot.Bot, update *
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
 
-	switch app.f.Current(userID) {
+	currentState, _ := app.f.Current(userID)
+
+	switch currentState {
 	case stateDefault:
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
@@ -150,7 +154,7 @@ func (app *Application) handlerDefault(ctx context.Context, b *bot.Bot, update *
 		app.f.Transition(userID, stateFinish, chatID, userID)
 
 	default:
-		fmt.Printf("unexpected state %s\n", app.f.Current(userID))
+		fmt.Printf("unexpected state %s\n", currentState)
 	}
 }
 
